@@ -50,18 +50,10 @@ impl ArrayState {
         self.max_value
     }
 
-    /// `true` when the values are in non-decreasing order. Used by tests and as
-    /// a sanity check after a timeline finishes playing.
+    /// `true` when the values are in non-decreasing order. Used by tests and by
+    /// a `debug_assert` sanity check after a timeline finishes playing.
     pub fn is_sorted(&self) -> bool {
         self.values.windows(2).all(|w| w[0] <= w[1])
-    }
-
-    /// Reset every element back to `Normal` without changing the values. Used
-    /// when re-seeding highlights at the start of a replay.
-    pub fn clear_all_highlights(&mut self) {
-        for s in &mut self.states {
-            *s = ElementState::Normal;
-        }
     }
 
     /// Apply one event, updating both values and highlight states.
@@ -137,7 +129,10 @@ impl ArrayState {
     /// Set a transient highlight, but never override a `Pivot` or `Sorted`
     /// element (those carry more important meaning).
     fn set_highlight(&mut self, index: usize, state: ElementState) {
-        if matches!(self.states[index], ElementState::Pivot | ElementState::Sorted) {
+        if matches!(
+            self.states[index],
+            ElementState::Pivot | ElementState::Sorted
+        ) {
             return;
         }
         self.states[index] = state;

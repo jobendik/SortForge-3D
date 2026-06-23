@@ -48,10 +48,6 @@ pub struct Recorder {
 }
 
 impl Recorder {
-    fn new() -> Self {
-        Self { events: Vec::new() }
-    }
-
     /// Pre-allocate roughly enough room for an O(n^2) run to avoid reallocs.
     fn with_capacity_for(n: usize) -> Self {
         Self {

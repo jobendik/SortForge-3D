@@ -53,9 +53,4 @@ impl Timeline {
         }
         event
     }
-
-    /// Borrow the full event list (used when replaying from scratch).
-    pub fn events(&self) -> &[SortEvent] {
-        &self.events
-    }
 }

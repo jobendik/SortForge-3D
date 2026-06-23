@@ -24,6 +24,11 @@ egui = "0.32"
 egui-winit = "0.32"
 egui-wgpu = "0.32"
 
+[dev-dependencies]
+# Same naga version wgpu 25 uses; lets us validate the WGSL shader in a unit
+# test without needing a live GPU.
+naga = { version = "25", features = ["wgsl-in"] }
+
 [profile.release]
 opt-level = 3
 lto = "thin"

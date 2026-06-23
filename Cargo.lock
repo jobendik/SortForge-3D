@@ -2368,6 +2368,7 @@ dependencies = [
  "env_logger",
  "glam",
  "log",
+ "naga",
  "pollster",
  "rand",
  "thiserror 2.0.18",

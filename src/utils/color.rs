@@ -43,6 +43,14 @@ impl Srgb {
     }
 }
 
+/// egui works in sRGB space, so the authored 8-bit channels map straight across
+/// (used for the color legend swatches).
+impl From<Srgb> for egui::Color32 {
+    fn from(c: Srgb) -> Self {
+        egui::Color32::from_rgb(c.r, c.g, c.b)
+    }
+}
+
 /// The "algorithm observatory" palette used throughout the visualization.
 ///
 /// Each entry maps to an [`crate::simulation::ElementState`] (see
