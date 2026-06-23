@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="430" viewBox="0 0 860 430" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#5b6b86"/>
+    </marker>
+    <style>
+      .box { rx: 10; ry: 10; stroke-width: 2; }
+      .title { font-size: 16px; font-weight: 700; }
+      .sub { font-size: 11.5px; fill: #9fb0c8; }
+      .edge { stroke: #5b6b86; stroke-width: 2; fill: none; }
+      .edgelbl { font-size: 11px; fill: #7d8ca6; font-style: italic; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="860" height="430" fill="#0a0c14"/>
+  <text x="30" y="40" fill="#e6ecf5" font-size="22" font-weight="700">SortForge 3D &#8212; data flow</text>
+  <text x="30" y="62" class="sub">Algorithms generate events &#183; the timeline plays them &#183; the renderer visualizes state</text>
+
+  <!-- Algorithms -->
+  <rect class="box" x="30" y="100" width="200" height="90" fill="#10233a" stroke="#3898e0"/>
+  <text x="50" y="132" class="title" fill="#7cc4ff">algorithms</text>
+  <text x="50" y="154" class="sub">Bubble / Insertion /</text>
+  <text x="50" y="170" class="sub">Selection / Quick</text>
+  <text x="50" y="186" class="sub">&#8594; emit Vec&lt;SortEvent&gt;</text>
+
+  <!-- Simulation -->
+  <rect class="box" x="330" y="80" width="220" height="130" fill="#11331f" stroke="#48c878"/>
+  <text x="350" y="112" class="title" fill="#7fe3a4">simulation</text>
+  <text x="350" y="134" class="sub">Timeline (cursor)</text>
+  <text x="350" y="150" class="sub">PlaybackController</text>
+  <text x="350" y="166" class="sub">ArrayState (what to draw)</text>
+  <text x="350" y="182" class="sub">Metrics (work counters)</text>
+  <text x="350" y="198" class="sub">play / pause / step / reset</text>
+
+  <!-- Renderer -->
+  <rect class="box" x="650" y="100" width="180" height="90" fill="#2a1330" stroke="#ba60e8"/>
+  <text x="670" y="132" class="title" fill="#d79bf2">renderer</text>
+  <text x="670" y="154" class="sub">wgpu instanced bars</text>
+  <text x="670" y="170" class="sub">orbit camera + grid</text>
+  <text x="670" y="186" class="sub">reads state, never sorts</text>
+
+  <!-- App -->
+  <rect class="box" x="330" y="300" width="220" height="90" fill="#33260f" stroke="#e8a030"/>
+  <text x="350" y="332" class="title" fill="#f0c460">app (winit loop)</text>
+  <text x="350" y="354" class="sub">advances playback by dt</text>
+  <text x="350" y="370" class="sub">routes input, draws frame</text>
+
+  <!-- UI -->
+  <rect class="box" x="40" y="300" width="190" height="90" fill="#241a33" stroke="#8a7bd8"/>
+  <text x="60" y="332" class="title" fill="#b9aef0">ui (egui)</text>
+  <text x="60" y="354" class="sub">reads a snapshot,</text>
+  <text x="60" y="370" class="sub">emits UiActions</text>
+
+  <!-- Edges -->
+  <path class="edge" d="M230,145 L325,145" marker-end="url(#arrow)"/>
+  <text x="240" y="138" class="edgelbl">events</text>
+
+  <path class="edge" d="M550,145 L645,145" marker-end="url(#arrow)"/>
+  <text x="560" y="138" class="edgelbl">state</text>
+
+  <path class="edge" d="M440,300 L440,215" marker-end="url(#arrow)"/>
+  <text x="450" y="260" class="edgelbl">update(dt)</text>
+
+  <path class="edge" d="M235,345 L325,345" marker-end="url(#arrow)"/>
+  <text x="240" y="338" class="edgelbl">actions</text>
+
+  <path class="edge" d="M650,180 C600,260 560,300 552,330" marker-end="url(#arrow)"/>
+  <text x="600" y="300" class="edgelbl">draw call</text>
+</svg>

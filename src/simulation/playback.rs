@@ -106,6 +106,13 @@ impl PlaybackController {
             Some(event) => {
                 self.metrics.record(&event);
                 self.state.apply(&event);
+                // Invariant: a correct algorithm's full event stream must leave
+                // the array sorted. Cheap to check in debug, compiled out in
+                // release.
+                debug_assert!(
+                    !self.timeline.is_finished() || self.state.is_sorted(),
+                    "timeline finished but array is not sorted"
+                );
                 true
             }
             None => {
@@ -197,11 +204,10 @@ impl PlaybackController {
 
     /// Playback progress in `0.0..=1.0`.
     pub fn progress(&self) -> f32 {
-        let total = self.timeline.len();
-        if total == 0 {
+        if self.timeline.is_empty() {
             1.0
         } else {
-            self.timeline.position() as f32 / total as f32
+            self.timeline.position() as f32 / self.timeline.len() as f32
         }
     }
 }
@@ -214,4 +220,64 @@ fn random_values(size: usize) -> Vec<u32> {
     let mut values: Vec<u32> = (1..=size as u32).collect();
     values.shuffle(&mut rand::thread_rng());
     values
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::algorithms::Algorithm;
+
+    #[test]
+    fn plays_through_to_a_sorted_array() {
+        let mut controller = PlaybackController::new(Algorithm::Quick, 32);
+        assert!(controller.total_steps() > 0);
+
+        // Drain every event.
+        while controller.step() {}
+
+        assert!(controller.is_finished());
+        assert!(controller.state().is_sorted());
+        assert_eq!(controller.current_step(), controller.total_steps());
+        assert_eq!(controller.progress(), 1.0);
+    }
+
+    #[test]
+    fn reset_restores_the_original_array_and_metrics() {
+        let mut controller = PlaybackController::new(Algorithm::Bubble, 16);
+        let original: Vec<u32> = controller.state().values().to_vec();
+
+        while controller.step() {}
+        assert!(controller.metrics().comparisons > 0);
+
+        controller.reset();
+        assert_eq!(controller.current_step(), 0);
+        assert_eq!(controller.state().values(), original.as_slice());
+        assert_eq!(controller.metrics().comparisons, 0);
+        assert_eq!(controller.metrics().swaps, 0);
+        assert_eq!(controller.metrics().writes, 0);
+    }
+
+    #[test]
+    fn switching_algorithm_rebuilds_and_rewinds() {
+        let mut controller = PlaybackController::new(Algorithm::Bubble, 24);
+        while controller.step() {}
+        assert!(controller.is_finished());
+
+        controller.set_algorithm(Algorithm::Selection);
+        assert_eq!(controller.algorithm(), Algorithm::Selection);
+        assert_eq!(controller.current_step(), 0);
+        assert!(!controller.is_finished());
+    }
+
+    #[test]
+    fn update_advances_proportionally_to_speed_and_time() {
+        let mut controller = PlaybackController::new(Algorithm::Selection, 40);
+        controller.set_speed(100.0);
+        controller.play();
+
+        // 100 events/sec for 0.1s => ~10 events.
+        controller.update(0.1);
+        let advanced = controller.current_step();
+        assert!((8..=12).contains(&advanced), "advanced {advanced} events");
+    }
 }
