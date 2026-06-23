@@ -40,3 +40,22 @@ jobs:
 
       - name: Test
         run: cargo test --locked
+
+  build-release:
+    name: release build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      # Separate cache key from the debug `check` job (different profile).
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: release
+
+      - name: Build (release, LTO)
+        run: cargo build --release --locked
+
